@@ -11,7 +11,6 @@ public class PhoneContract {
     }
     public static abstract class PhoneEntry implements BaseColumns{
         public static final String TABLE_NAME = "Phone";
-        public static final String COLUMN_NAME_PHONE_NAME = "phone_name";
         public static final String COLUMN_NAME_DEVICE_ADDRESS = "device_address";
         public static final String COLUMN_NAME_OS = "operating_system";
         public static final String COLUMN_NAME_BRAND = "brand";

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import crashavoidance.se.rit.datacollector.service.DBParcelable;
+
 
 /**
  * Created by Chris on 6/12/2016.
@@ -49,7 +51,6 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
             CREATE_TABLE + PhoneContract.PhoneEntry.TABLE_NAME + "("
                 + PhoneContract.PhoneEntry._ID + PRIMARY_KEY
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_DEVICE_ADDRESS + TEXT
-                + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_PHONE_NAME + TEXT
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_BRAND + TEXT
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_OS + INTEGER
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_MANUFACTURER + TEXT
@@ -100,15 +101,15 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
      */
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_PHONE_TABLE);
-        db.execSQL(SQL_CREATE_RUN_TABLE);
+//        db.execSQL(SQL_CREATE_RUN_TABLE);
         db.execSQL(SQL_CREATE_STEP_TABLE);
         db.execSQL(SQL_CREATE_STEP_TIMER_TABLE);
         try {
             populateSteps(db);
-            populatePhoneInfo(db);
         } catch (Exception e) {
             Log.e(TAG, "Exception parsing Step file", e);
         }
+        populatePhoneInfo(db);
     }
 
     /**
@@ -156,20 +157,17 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
         String manufacturer = Build.MANUFACTURER;
         int osVersion = Build.VERSION.SDK_INT;
         // For the device Address and Device name we need a WifiP2pDevice object
-        WifiP2pDevice device = new WifiP2pDevice();
-        String deviceAddress = device.deviceAddress;
-        String deviceName = device.deviceName;
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = manager.getConnectionInfo();
+        String deviceAddress = info.getMacAddress();
         values.put(PhoneContract.PhoneEntry.COLUMN_NAME_BRAND, brand);
         values.put(PhoneContract.PhoneEntry.COLUMN_NAME_DEVICE_ADDRESS, deviceAddress);
         values.put(PhoneContract.PhoneEntry.COLUMN_NAME_MANUFACTURER, manufacturer);
         values.put(PhoneContract.PhoneEntry.COLUMN_NAME_OS, osVersion);
         values.put(PhoneContract.PhoneEntry.COLUMN_NAME_MODEL, myDeviceModel);
-        values.put(PhoneContract.PhoneEntry.COLUMN_NAME_PHONE_NAME, deviceName);
-        db.beginTransaction();;
         long newRowId = db.insert(PhoneContract.PhoneEntry.TABLE_NAME
                                     ,null
                                     ,values);
-        db.endTransaction();
     }
 
 
@@ -187,6 +185,24 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    /**
+     * Inserts a row in the step timer table based on information passed to the
+     * background service
+     * @param parcelableObject
+     */
+    public void insertStepTimerRecord(DBParcelable parcelableObject) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        // Since we only have one phone record this id is always 1
+        values.put(StepTimerContract.StepEntry.COLUMN_NAME_PHONE_ID, 1);
+        values.put(StepTimerContract.StepEntry.COLUMN_NAME_START_TIME, parcelableObject.getStartTime());
+        values.put(StepTimerContract.StepEntry.COLUMN_NAME_END_TIME, parcelableObject.getEndTime());
+        values.put(StepTimerContract.StepEntry.COLUMN_NAME_STEP_NAME, parcelableObject.getStep());
+        long newRowId = db.insert(PhoneContract.PhoneEntry.TABLE_NAME
+                ,null
+                ,values);
     }
 
     /**

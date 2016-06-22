@@ -3,6 +3,8 @@ package crashavoidance.se.rit.datacollector.service;
 import android.app.IntentService;
 import android.content.Intent;
 
+import crashavoidance.se.rit.datacollector.db.WifiDirectDBHelper;
+
 /**
  * Created by Chris on 6/19/2016.
  * Handles intents sent by other apps to insert records into the
@@ -10,12 +12,13 @@ import android.content.Intent;
  */
 public class DBHandlerService extends IntentService{
 
-    private String serviceName;
-    private final String action = "insertRecord";
+    public static final String ACTION = "insertRecord";
+    public static final String PARCELABLE_NAME = "record";
+    WifiDirectDBHelper dbHelper;
 
     public DBHandlerService(){
         super("DBHandlerService");
-        this.serviceName = serviceName;
+        dbHelper = new WifiDirectDBHelper(this.getApplicationContext());
     }
 
     /**
@@ -24,8 +27,10 @@ public class DBHandlerService extends IntentService{
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent.getAction().equals(action)){
-
+        // Inserts a step timer record based on DBParcelable object passed to the service
+        if (intent.getAction().equals(ACTION)){
+            DBParcelable dbObject = intent.getParcelableExtra(PARCELABLE_NAME);
+            dbHelper.insertStepTimerRecord(dbObject);
         }
     }
 }

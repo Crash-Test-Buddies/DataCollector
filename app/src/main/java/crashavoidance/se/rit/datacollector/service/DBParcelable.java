@@ -8,8 +8,33 @@ import android.os.Parcelable;
  */
 public class DBParcelable implements Parcelable {
 
+    public String getStep() {
+        return step;
+    }
+
+    public void setStep(String step) {
+        this.step = step;
+    }
+
+    public int getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
+
     private String step; // Step the run is performed for
     private int startTime; // Start time of step
+
+    public int getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+    }
+
     private int endTime; // End time of step
 
     public DBParcelable(String step, int startTime, int endTime){

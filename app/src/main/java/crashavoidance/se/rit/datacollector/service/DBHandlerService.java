@@ -12,7 +12,6 @@ import crashavoidance.se.rit.datacollector.db.WifiDirectDBHelper;
  */
 public class DBHandlerService extends IntentService{
 
-    public static final String ACTION = "insertRecord";
     public static final String PARCELABLE_NAME = "record";
     WifiDirectDBHelper dbHelper;
 
@@ -27,10 +26,7 @@ public class DBHandlerService extends IntentService{
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Inserts a step timer record based on DBParcelable object passed to the service
-        if (intent.getAction().equals(ACTION)){
-            DBParcelable dbObject = intent.getParcelableExtra(PARCELABLE_NAME);
-            dbHelper.insertStepTimerRecord(dbObject);
-        }
+        DBParcelable dbObject = intent.getParcelableExtra(PARCELABLE_NAME);
+        dbHelper.insertStepTimerRecord(dbObject);
     }
 }

@@ -16,5 +16,6 @@ public class StepTimerContract {
         public static final String COLUMN_NAME_END_TIME = "end_time";
         public static final String COLUMN_NAME_LATITUDE = "latitude";
         public static final String COLUMN_NAME_LONGITUDE = "longitude";
+        public static final String COLUMN_NAME_STATUS = "status";
     }
 }

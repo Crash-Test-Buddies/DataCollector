@@ -16,5 +16,6 @@ public class PhoneContract {
         public static final String COLUMN_NAME_BRAND = "brand";
         public static final String COLUMN_NAME_MANUFACTURER = "manufacturer";
         public static final String COLUMN_NAME_MODEL = "model";
+        public static final String COLUMN_NAME_STATUS = "status";
     }
 }

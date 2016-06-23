@@ -53,6 +53,7 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_OS + INTEGER
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_MANUFACTURER + TEXT
                 + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_MODEL + TEXT
+                + COMMA + PhoneContract.PhoneEntry.COLUMN_NAME_STATUS + TEXT
                 + ")";
 
     private static final String SQL_CREATE_RUN_TABLE =
@@ -76,6 +77,7 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
                 + COMMA + StepTimerContract.StepEntry.COLUMN_NAME_END_TIME + INTEGER
                 + COMMA + StepTimerContract.StepEntry.COLUMN_NAME_LATITUDE + DOUBLE
                 + COMMA + StepTimerContract.StepEntry.COLUMN_NAME_LONGITUDE + DOUBLE
+                + COMMA + StepTimerContract.StepEntry.COLUMN_NAME_STATUS + TEXT
                 + COMMA + FOREIGN_KEY + StepTimerContract.StepEntry.COLUMN_NAME_PHONE_ID + REFERENCES
                 + PhoneContract.PhoneEntry.TABLE_NAME + "(" + PhoneContract.PhoneEntry._ID + ")"
                 + ")";

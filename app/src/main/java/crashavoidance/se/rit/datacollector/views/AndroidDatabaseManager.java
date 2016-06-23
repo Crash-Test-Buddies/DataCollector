@@ -32,7 +32,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import crashavoidance.se.rit.datacollector.db.WifiDirectDBHelper;
+import crashavoidance.se.rit.datacollector.persistence.WifiDirectDBHelper;
 
 
 public class AndroidDatabaseManager extends Activity implements OnItemClickListener {

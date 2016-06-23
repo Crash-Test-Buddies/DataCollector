@@ -3,7 +3,7 @@ package crashavoidance.se.rit.datacollector.service;
 import android.app.IntentService;
 import android.content.Intent;
 
-import crashavoidance.se.rit.datacollector.db.WifiDirectDBHelper;
+import crashavoidance.se.rit.datacollector.persistence.WifiDirectDBHelper;
 
 /**
  * Created by Chris on 6/19/2016.

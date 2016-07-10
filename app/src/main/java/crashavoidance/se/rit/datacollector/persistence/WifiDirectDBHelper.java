@@ -228,10 +228,11 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
     public void updateStepTimerStatuses(List<Long> idsToUpdate){
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "Update " + StepTimerContract.StepEntry.TABLE_NAME + " set " + StepTimerContract.StepEntry.COLUMN_NAME_STATUS
-                + " = Uploaded where " + StepTimerContract.StepEntry._ID + " = ?";
+                + " = ? where " + StepTimerContract.StepEntry._ID + " = ?";
         SQLiteStatement update = db.compileStatement(sql);
         db.beginTransaction();
         for (long id : idsToUpdate){
+            update.bindString(1, "Uploaded");
             update.bindLong(1, id);
             update.execute();
         }
@@ -245,9 +246,10 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
      */
     public long getReadyStepCount(){
         SQLiteDatabase db = this.getReadableDatabase();
-        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = Ready";
+        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = ?";
+        String[] selectionArgs = {"Ready"};
         // Selects number of records based on selection criteria
-        long numReady = DatabaseUtils.queryNumEntries(db, StepTimerContract.StepEntry.TABLE_NAME, selection);
+        long numReady = DatabaseUtils.queryNumEntries(db, StepTimerContract.StepEntry.TABLE_NAME, selection, selectionArgs);
         return numReady;
     }
 
@@ -266,9 +268,10 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
             ,StepTimerContract.StepEntry.COLUMN_NAME_LONGITUDE
             ,StepTimerContract.StepEntry.COLUMN_NAME_STEP_NAME};
         // Query for records with status of Ready
-        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = Ready";
+        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = ?";
+        String[] selectionArgs = {"Ready"};
         // Query for up to 1000 StepTimer records with status of ready
-        Cursor stepBatch = db.query(StepTimerContract.StepEntry.TABLE_NAME, columns, selection, null, null, null, batchLimit);
+        Cursor stepBatch = db.query(StepTimerContract.StepEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, batchLimit);
         return stepBatch;
     }
 

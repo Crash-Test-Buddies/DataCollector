@@ -3,10 +3,12 @@ package crashavoidance.se.rit.datacollector.persistence;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -18,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import crashavoidance.se.rit.datacollector.service.DBParcelable;
 
@@ -205,6 +208,68 @@ public class WifiDirectDBHelper extends SQLiteOpenHelper {
         long newRowId = db.insert(PhoneContract.PhoneEntry.TABLE_NAME
                 ,null
                 ,values);
+    }
+
+    public Cursor getPhoneInfo() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {PhoneContract.PhoneEntry.COLUMN_NAME_BRAND
+            ,PhoneContract.PhoneEntry.COLUMN_NAME_DEVICE_ADDRESS
+            ,PhoneContract.PhoneEntry.COLUMN_NAME_MANUFACTURER
+            ,PhoneContract.PhoneEntry.COLUMN_NAME_MODEL
+            ,PhoneContract.PhoneEntry.COLUMN_NAME_OS};
+        Cursor phoneInfo = db.query(PhoneContract.PhoneEntry.TABLE_NAME, columns, null, null, null, null, null);
+        return phoneInfo;
+    }
+
+    /**
+     * Update Step timer records to Uploaded
+     * @param idsToUpdate ids to update with
+     */
+    public void updateStepTimerStatuses(List<Long> idsToUpdate){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "Update " + StepTimerContract.StepEntry.TABLE_NAME + " set " + StepTimerContract.StepEntry.COLUMN_NAME_STATUS
+                + " = Uploaded where " + StepTimerContract.StepEntry._ID + " = ?";
+        SQLiteStatement update = db.compileStatement(sql);
+        db.beginTransaction();
+        for (long id : idsToUpdate){
+            update.bindLong(1, id);
+            update.execute();
+        }
+        db.setTransactionSuccessful();
+    }
+
+
+    /**
+     * Get the number of step records ready to be uploaded so we know how many batches to grab
+     * @return
+     */
+    public long getReadyStepCount(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = Ready";
+        // Selects number of records based on selection criteria
+        long numReady = DatabaseUtils.queryNumEntries(db, StepTimerContract.StepEntry.TABLE_NAME, selection);
+        return numReady;
+    }
+
+    /**
+     * Get a batch of stepTimer records that are ready to be uploaded to the central database
+     * @param batchLimit Max number of records to be returned
+     * @return Cursor containing up to batchLimit number of StepTimer records ready to be sent to central database
+     */
+    public Cursor getStepBatch(String batchLimit){
+        SQLiteDatabase db = this.getReadableDatabase();
+        // Columns to select
+        String[] columns = {StepTimerContract.StepEntry._ID
+            ,StepTimerContract.StepEntry.COLUMN_NAME_START_TIME
+            ,StepTimerContract.StepEntry.COLUMN_NAME_END_TIME
+            ,StepTimerContract.StepEntry.COLUMN_NAME_LATITUDE
+            ,StepTimerContract.StepEntry.COLUMN_NAME_LONGITUDE
+            ,StepTimerContract.StepEntry.COLUMN_NAME_STEP_NAME};
+        // Query for records with status of Ready
+        String selection = StepTimerContract.StepEntry.COLUMN_NAME_STATUS + " = Ready";
+        // Query for up to 1000 StepTimer records with status of ready
+        Cursor stepBatch = db.query(StepTimerContract.StepEntry.TABLE_NAME, columns, selection, null, null, null, batchLimit);
+        return stepBatch;
     }
 
     /**
